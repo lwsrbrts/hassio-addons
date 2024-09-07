@@ -1,6 +1,6 @@
 name: "PowerShell"
 description: "Run PowerShell scripts in Home Assistant"
-version: "0.0.1"
+version: "0.0.2"
 slug: "pwsh"
 init: false
 arch:
@@ -19,4 +19,5 @@ options:
 schema:
   scripts:
     - filename: str
+      path: "str?"
   threads: "int(1,10)"
