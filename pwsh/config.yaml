@@ -6,7 +6,7 @@ init: false
 arch:
   - amd64
 startup: application
-url: "https://github.com/lwsrbrts/hass-pwsh"
+url: "https://github.com/lwsrbrts/hassio-addons/pwsh"
 #ports:
 #  8000/tcp: 8000
 map:
