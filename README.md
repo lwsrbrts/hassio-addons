@@ -10,4 +10,4 @@ https://github.com/lwsrbrts/hassio-addons
 ```
 
 ## Add-ons in this repository
- - **[PowerShell](/pwsh/README.md)**: Create snapshots and store them on a Samba share.
+ - **[PowerShell](/pwsh/README.md)**: Run PowerShell scripts in Home Assistant.
