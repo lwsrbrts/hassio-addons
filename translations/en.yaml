@@ -1,0 +1,15 @@
+---
+configuration:
+  scripts:
+    name: Scripts
+    description: >-
+      A list of filenames of scripts you wish to run.
+      The script must exist in the \\{HASS}\share\pwsh folder.
+  threads:
+    name: Throttle/Thread Limit
+    description: >-
+      The thread limit for the number of jobs to be launched. Threading is
+      handled automatically with jobs/scripts waiting for a slot when you want 
+      to run more scripts than the set Throttle Limit.
+      Ensure you don't set all your scripts to run in infinite loops or some
+      may never run if there are inadequate threads available.

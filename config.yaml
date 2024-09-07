@@ -1,0 +1,22 @@
+name: "PowerShell"
+description: "Run PowerShell scripts in Home Assistant"
+version: "0.0.1"
+slug: "pwsh"
+init: false
+arch:
+  - amd64
+startup: application
+url: "https://github.com/lwsrbrts/hass-pwsh"
+#ports:
+#  8000/tcp: 8000
+map:
+  - type: share
+    read_only: false
+homeassistant_api: true
+options:
+  scripts: []
+  threads: 5
+schema:
+  scripts:
+    - filename: str
+  threads: "int(1,10)"
