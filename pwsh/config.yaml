@@ -1,12 +1,12 @@
 name: "PowerShell"
 description: "Run PowerShell scripts in Home Assistant"
-version: "0.0.2"
+version: "0.0.3"
 slug: "pwsh"
 init: false
 arch:
   - amd64
 startup: application
-url: "https://github.com/lwsrbrts/hassio-addons/pwsh"
+url: "https://github.com/lwsrbrts/hassio-addons/tree/main/pwsh"
 #ports:
 #  8000/tcp: 8000
 map:

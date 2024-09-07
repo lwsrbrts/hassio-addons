@@ -4,7 +4,7 @@ configuration:
     name: Scripts
     description: >-
       A list of filenames of scripts you wish to run.
-      The script must exist in the \\{HASS}\share\pwsh folder.
+      Optionally provide a path: with trailing slash eg. /share/mynetworkshare/
   threads:
     name: Throttle/Thread Limit
     description: >-
