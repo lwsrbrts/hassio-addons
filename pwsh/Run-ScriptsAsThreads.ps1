@@ -1,13 +1,14 @@
 # Set up some stuff we only need to do once.
 # Set the culture to British English, since I'm British.
-$CultureInfo = New-Object System.Globalization.CultureInfo("en-GB")
-[System.Threading.Thread]::CurrentThread.CurrentCulture = $CultureInfo
-[System.Threading.Thread]::CurrentThread.CurrentUICulture = $CultureInfo
+#$CultureInfo = New-Object System.Globalization.CultureInfo("en-GB")
+#[System.Threading.Thread]::CurrentThread.CurrentCulture = $CultureInfo
+#[System.Threading.Thread]::CurrentThread.CurrentUICulture = $CultureInfo
 
 # Path to options.json file - this is the file that's placed/mapped/linked in to the running container.
 $OPTIONS_FILE = '/data/options.json'
+
 # Read and convert the JSON file to a PowerShell object - we'll use these to get data from the user for use later.
-$OPTIONS = Get-Content $OPTIONS_FILE | ConvertFrom-Json
+$OPTIONS = Get-Content $OPTIONS_FILE | ConvertFrom-Json -ErrorAction Stop
 
 # Throttle Limit defines the number of scripts that will be started as threads by *this* script.
 # Bear in mind that if the `Scripts` list's first n scripts run as infinite loops, any scripts over
@@ -24,10 +25,10 @@ if ($OPTIONS.scripts.length -gt 10) {
     throw "Scripts are limited to a maximum of 10 at a single time."
 }
 
-# /mnt/data/supervisor/addons/data/local_pwsh is what's mapped to the container and where options.json lives.
+# /mnt/data/supervisor/addons/data/local_pwsh is mapped from the host to the container as /data and where options.json lives.
 # We want the share folder to map to the container so the user places their scripts there.
-$scriptLocation = '/share/pwsh/'
-if (!(Test-Path $scriptLocation)) {
+$defaultScriptLocation = '/share/pwsh/'
+if (!(Test-Path $defaultScriptLocation)) {
     $FolderBanner = @"
 ${green}
 #####################################
@@ -41,7 +42,7 @@ ${green}
 #########################################################${reset}
 "@
     $FolderBanner
-    New-Item -Path $scriptLocation -ItemType Directory > $null
+    New-Item -Path $defaultScriptLocation -ItemType Directory > $null
     Exit 0
 }
 
@@ -53,9 +54,42 @@ $jobColours = @{}
 $randomisedColours = $PSStyle.Background.PSObject.Properties.Name | Where-Object { $_ -notmatch "Bright" } | Sort-Object { Get-Random }
 $i = 0
 
+$scriptCount = $scripts.Count
+
+if ($scriptCount -gt 0) {
+    $StartupBanner = @"
+${green}
+######################
+## PowerShell $($PSVersionTable.PSVersion.ToString()) ##
+##                  ##
+## Starting up...   ##
+## ThrottleLimit: $ThreadThrottleLimit ##
+## $(Get-Date -UFormat '%d/%m/%Y %H:%M') ##
+######################
+${reset}
+"@
+    $StartupBanner
+}
+else {
+    $NoScriptsBanner = @"
+${green}
+######################################
+## No scripts were found in the     ##
+## Configuration -> Scripts section ##
+## of the add-on. 🤦                ##
+## Nothing else to do. Bye.         ##
+######################################
+${reset}
+"@
+    $NoScriptsBanner
+    Exit 0
+}
+
 # Loop through each script and start a thread job for each one
 foreach ($script in $scripts) {
-        
+    
+    if ($null -eq $script.path) { $scriptLocation = $defaultScriptLocation }
+    else { $scriptLocation = $script.path }
     $validPath = Test-Path -Path "$scriptLocation$($script.filename)" -PathType Leaf
 
     if ($validPath) {
@@ -65,17 +99,18 @@ foreach ($script in $scripts) {
 
             $randomColour = $randomisedColours[$i]
             $jobColours[$job.Name] = $randomColour  # Store the job name and its associated colour
+            "$($PSStyle.Background.$randomColour)$($job.Name)$($PSStyle.Reset) {0}." -f 'created'
             $i++
             if ($i -eq 8) { $i = 0 }
         }
         catch {
-            "$($PSStyle.Foreground.Red)Unable to start the thread for: {0}$($PSStyle.Reset)" -f $script.filename
+            "$($PSStyle.Foreground.Red)Unable to start the thread for: {0}{1}$($PSStyle.Reset)" -f $scriptLocation, $script.filename
             $i++
             if ($i -eq 8) { $i = 0 }
         }
     }
     else {
-        "$($PSStyle.Foreground.Red)Unable to find a filename: {0}$($PSStyle.Reset)" -f $script.filename
+        "$($PSStyle.Foreground.Red)Unable to find path: {0}{1}$($PSStyle.Reset)" -f $scriptLocation, $script.filename
     }
 }
 
@@ -86,8 +121,8 @@ if ($jobCount -eq 0) {
 ${green}
 ##################################################
 ## No thread jobs were added. Did you forget to ##
-## add your scripts or declare them in the      ##
-## configuration?                               ##
+## add your scripts in the right place ?        ##
+## Nothing else to do. Bye.                     ##
 ##################################################
 ${reset}
 "@
@@ -95,18 +130,16 @@ ${reset}
     Exit 0
 }
 else {
-    $StartupBanner = @"
+    $JobsRunningBanner = @"
 ${green}
 ######################
-## PowerShell $($PSVersionTable.PSVersion.ToString()) ##
-##                  ##
 ## Jobs are running ##
 ## ThrottleLimit: $ThreadThrottleLimit ##
 ## $(Get-Date -UFormat '%d/%m/%Y %H:%M') ##
 ######################
 ${reset}
 "@
-    $StartupBanner
+    $JobsRunningBanner
 
     # Deals with the case where we receive multiple lines or a single line of output from Receive-Job.
     function Out-JobData {
