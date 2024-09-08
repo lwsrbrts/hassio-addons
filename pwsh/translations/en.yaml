@@ -3,7 +3,7 @@ configuration:
   scripts:
     name: Scripts
     description: >-
-      A list of filenames of scripts you wish to run.
+      A list of filenames of scripts you wish to run at startup.
       Optionally provide a path: with trailing slash eg. /share/mynetworkshare/
   threads:
     name: Throttle/Thread Limit
@@ -13,3 +13,10 @@ configuration:
       to run more scripts than the set Throttle Limit.
       Ensure you don't set all your scripts to run in infinite loops or some
       may never run if there are inadequate threads available.
+  ondemand:
+    name: On-Demand Mode
+    description: >-
+      Make use of the hassio.addon_stdin action in Home Assistant to run
+      scripts on-demand.
+      This allows you to schedule the running of scripts using Home Assistant.
+      WARNING: This can be considered a security risk.

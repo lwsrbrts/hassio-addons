@@ -1,8 +1,9 @@
 name: "PowerShell"
 description: "Run PowerShell scripts in Home Assistant"
-version: "0.0.3"
+version: "0.0.4"
 slug: "pwsh"
 init: false
+stdin: true
 arch:
   - amd64
 startup: application
@@ -16,8 +17,10 @@ homeassistant_api: true
 options:
   scripts: []
   threads: 5
+  ondemand: false
 schema:
   scripts:
     - filename: str
       path: "str?"
   threads: "int(1,10)"
+  ondemand: bool

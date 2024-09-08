@@ -18,6 +18,7 @@ $ThreadThrottleLimit = [int]$OPTIONS.threads
 
 # Colours for banner information during startup etc.
 $green = $PSStyle.Foreground.Green
+$red = $PSStyle.Foreground.Red
 $reset = $PSStyle.Reset
 
 # We still want to limit the number of scripts.
@@ -83,6 +84,28 @@ ${reset}
 "@
     $NoScriptsBanner
     Exit 0
+}
+
+# Warn the user that on-demand is enabled.
+$ondemand = $OPTIONS.ondemand
+if ($ondemand) {
+    $OnDemandBanner = @"
+${red}
+###############################################
+##      ! ON-DEMAND MODE ENABLED !           ##
+##                                           ##
+##   When enabled, a thread job is created   ##
+##   to stop the add-on from exiting after   ##
+##   defined startup scripts complete.       ##
+##                                           ##
+## Use hassio.addon_stdin to send filenames. ##
+## Please review the README for more detail. ##
+###############################################
+${reset}
+"@
+    $OnDemandBanner
+    #Start-ThreadJob -ScriptBlock {while($true){Start-Sleep -Seconds 3600}} -Name 'On-Demand-Listener' -ErrorAction Stop -ThrottleLimit $ThreadThrottleLimit > $null
+    Start-Process nohup 'pwsh -NoProfile -NoLogo -File /app/Read-HassIoStdIn.ps1'
 }
 
 # Loop through each script and start a thread job for each one
