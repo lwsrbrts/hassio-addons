@@ -104,7 +104,7 @@ ${red}
 ${reset}
 "@
     $OnDemandBanner
-    #Start-ThreadJob -ScriptBlock {while($true){Start-Sleep -Seconds 3600}} -Name 'On-Demand-Listener' -ErrorAction Stop -ThrottleLimit $ThreadThrottleLimit > $null
+    Start-ThreadJob -ScriptBlock {while($true){Start-Sleep -Seconds 3600}} -Name 'On-Demand-Listener' -ErrorAction Stop -ThrottleLimit $ThreadThrottleLimit > $null
     Start-Process nohup 'pwsh -NoProfile -NoLogo -File /app/Read-HassIoStdIn.ps1'
 }
 

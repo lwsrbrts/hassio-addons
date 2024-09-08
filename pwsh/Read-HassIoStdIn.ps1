@@ -1,25 +1,29 @@
 # Now wait for on-demand script starts.
 while ($true) {
-    $filenames = Read-Host
-    Write-Output $filenames -NoEnumerate
+    $fromHassIo = Read-Host
 
-    $files = $filenames | ConvertFrom-Json
-    $files
+    $inputJSON = $fromHassIo | ConvertFrom-Json -ErrorAction Continue
+    $scripts = $inputJSON.scripts
 
     $defaultScriptPath = '/share/pwsh/'
 
-    foreach ($script in $files.filenames) {
-        $scriptPath = "{0}{1}" -f $defaultScriptPath, $script
+    $red = $PSStyle.Foreground.Red
+    $reset = $PSStyle.Reset
+
+    foreach ($script in $scripts) {
+        $scriptPath = if ($script.path) { $script.path } else { $defaultScriptPath }
+        $fullScriptPath = "{0}{1}" -f $scriptPath, $script.filename
     
-        if (Test-Path $scriptPath) {    
+        if (Test-Path $fullScriptPath) {    
             try {
-                Start-Process -FilePath 'pwsh' -ArgumentList "-File `"$scriptPath`""
+                Write-Output "$($red)On demand:$($reset) Attempting to run $fullScriptPath..."
+                Start-Process -FilePath 'pwsh' -ArgumentList "-File `"$fullScriptPath`""
             }
             catch {
-                Write-Host "Error executing command: $_"
+                Write-Host "Error executing script: $_"
             }
         }
-        else { 'No file named: {0}' -f $scriptPath }
+        else { 'No file named: {0}' -f $fullScriptPath }
     }
-    Start-Sleep -Seconds 5
+    Start-Sleep -Seconds 1
 }
