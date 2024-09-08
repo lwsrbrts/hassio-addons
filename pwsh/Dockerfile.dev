@@ -3,7 +3,7 @@
 FROM mcr.microsoft.com/powershell:latest
 
 LABEL \
-  io.hass.version="0.0.3" \
+  io.hass.version="0.0.4" \
   io.hass.type="addon" \
   io.hass.arch="amd64"
 
@@ -31,5 +31,6 @@ RUN \
   && echo $TZ > /etc/timezone
 
 COPY Run-ScriptsAsThreads.ps1 /app/
+COPY Read-HassIoStdIn.ps1 /app/
 
 ENTRYPOINT ["pwsh","-NoProfile", "-NoLogo", "-NonInteractive","-File","/app/Run-ScriptsAsThreads.ps1"]

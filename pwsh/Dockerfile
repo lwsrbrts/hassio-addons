@@ -84,5 +84,6 @@ RUN apk add --no-cache \
   }"
 
 COPY Run-ScriptsAsThreads.ps1 /app/
+COPY Read-HassIoStdIn.ps1 /app/
 
 ENTRYPOINT ["pwsh","-NoProfile", "-NoLogo", "-NonInteractive","-File","/app/Run-ScriptsAsThreads.ps1"]
