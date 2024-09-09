@@ -1,6 +1,6 @@
 # Home Assistant Add-on: PowerShell for Home Assistant
 
-Run PowerShell scripts as threaded jobs in Home Assistant with logging.
+Run PowerShell scripts in Home Assistant.
 
 ![Supports amd64 Architecture][amd64-shield]
 
@@ -29,8 +29,8 @@ For **Declared** scripts, either:
 
 Start the add-on and review the `Log` section to see any output.
 
-For **On-demand** scripts:
-1. Ensure that the `On-demand` feature toggle is enabled in the `Configuration` section of the add-on.
+For **On-Demand** scripts:
+1. Ensure that the `On-Demand` feature toggle is enabled in the `Configuration` section of the add-on.
 2. Follow the same process as for **Declared** scripts to get your scripts in to a directory off `/share/`
 3. Use the Home Assistant Action `hassio.addon_stdin` to send properly formatted data containing the `filename`s and their `path`s (if not in `/share/pwsh/`) to the add-on.
 
@@ -55,7 +55,7 @@ The add-on is just a Docker container with PowerShell installed which, when star
 
 **Declared** scripts are executed as PowerShell threaded jobs using `Start-ThreadJob`. The jobs are regularly checked for any output and "received" by the parent threading process, such that you can get logs from your scripts without jumping through hoops.
 
-**On-Demand** scripts run using `Start-Process` with only the `-File <path>` argument supplied to the process.
+**On-Demand** scripts are run using `Start-Process` calling only the PowerShell binary `pwsh` and supplying the `-File <path>` argument to the process.
 
 ## Why does it only run my script once or the add-on keep stopping?
 
@@ -72,6 +72,22 @@ If your script isn't working, please don't ask me to fix it or ask me why it isn
 In this iteration, you can't. You would need to add or declare all your arguments as variables and store them within the script.
 
 Technically there's no reason why you can't have this add-on run a script that calls your other script but logging may not work as expected or you'll need to manage that in your script yourself.
+
+## How do I use my own/PowerShell Gallery modules?
+
+With this add-on being a container, you must consider how you handle modules across upgrades since installing modules with `Install-Module` will work, but when you upgrade, the new container image won't have those modules installed. It's the same reason you store your scripts outside of the container in `/share/...`.
+
+For simplicity, my suggestion is that you use `Save-PSResource` ( `Save-Module` is an alias of `Save-PSResource`) and specify the location where you want to store your scripts. Copy something like this in to a script and configure the add-on to run it:
+
+```powershell
+Save-PSResource -Name [Module Name] -Repository PSGallery -Path '/share/pwsh/psmodules'
+```
+
+Then when you want to use the module in a different script, you can `Import-Module` from the location you saved it to, like this:
+
+```powershell
+Import-Module -Name /share/psmodules/[Module Name]/ -Verbose
+```
 
 ## Logging
 
