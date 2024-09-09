@@ -1,6 +1,6 @@
 name: "PowerShell"
 description: "Run PowerShell scripts in Home Assistant"
-version: "0.0.4"
+version: "0.0.5"
 slug: "pwsh"
 init: false
 stdin: true

@@ -73,6 +73,22 @@ In this iteration, you can't. You would need to add or declare all your argument
 
 Technically there's no reason why you can't have this add-on run a script that calls your other script but logging may not work as expected or you'll need to manage that in your script yourself.
 
+## How do I use my own/PowerShell Gallery modules?
+
+With this add-on being a container, you must consider how you handle modules across upgrades since installing modules with `Install-Module` will work, but when you upgrade, the new container image won't have those modules installed. It's the same reason you store your scripts outside of the container in `/share/...`.
+
+For simplicity, my suggestion is that you use `Save-PSResource` ( `Save-Module` is an alias of `Save-PSResource`) and specify the location where you want to store your scripts. Copy something like this in to a script and configure the add-on to run it:
+
+```powershell
+Save-PSResource -Name [Module Name] -Repository PSGallery -Path '/share/pwsh/psmodules'
+```
+
+Then when you want to use the module in a different script, you can `Import-Module` from the location you saved it to, like this:
+
+```powershell
+Import-Module -Name /share/psmodules/[Module Name]/ -Verbose
+```
+
 ## Logging
 
 For **Declared** scripts, logs are output to the `Log` section of the add-on, logs are colour highlighted to aid visibility and named according to the name of the script.

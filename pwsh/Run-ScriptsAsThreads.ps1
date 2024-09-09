@@ -36,15 +36,37 @@ ${green}
 ## Creating /share/pwsh folder...  ##
 #####################################
 
-#########################################################
-## Since the folder has just been created, the script  ##
-## will stop here. Add your scripts and configure the  ##
-## add-on now.                                         ##
-#########################################################${reset}
+########################################################
+## Since the folder has just been created, the add-on ##
+## will stop now. Add your scripts and configure the  ##
+## add-on now.                                        ##
+########################################################${reset}
 "@
     $FolderBanner
     New-Item -Path $defaultScriptLocation -ItemType Directory > $null
     Exit 0
+}
+
+# Warn the user that on-demand is enabled.
+$ondemand = $OPTIONS.ondemand
+if ($ondemand) {
+    $OnDemandBanner = @"
+${red}
+###############################################
+##      ! ON-DEMAND MODE ENABLED !           ##
+##                                           ##
+##   When enabled, a thread job is created   ##
+##   to stop the add-on from exiting after   ##
+##   Declared scripts complete.              ##
+##                                           ##
+## Use hassio.addon_stdin to send filenames. ##
+## Please review the README for more detail. ##
+###############################################
+${reset}
+"@
+    $OnDemandBanner
+    Start-ThreadJob -ScriptBlock {while($true){Start-Sleep -Seconds 3600}} -Name 'On-Demand-Listener' -ErrorAction Stop -ThrottleLimit $ThreadThrottleLimit > $null
+    Start-Process nohup 'pwsh -NoProfile -NoLogo -File /app/Read-HassIoStdIn.ps1'
 }
 
 # Doing this forces the user to know and set what scripts will run. Just banging them in a folder ain't good.
@@ -60,24 +82,28 @@ $scriptCount = $scripts.Count
 if ($scriptCount -gt 0) {
     $StartupBanner = @"
 ${green}
-######################
-## PowerShell $($PSVersionTable.PSVersion.ToString()) ##
-##                  ##
-## Starting up...   ##
-## ThrottleLimit: $ThreadThrottleLimit ##
-## $(Get-Date -UFormat '%d/%m/%Y %H:%M') ##
-######################
+###########################
+## DECLARED SCRIPTS MODE ##
+##                       ##
+##    Starting up...     ##
+##                       ##
+##   PowerShell $($PSVersionTable.PSVersion.ToString())    ##
+##   ThrottleLimit: $ThreadThrottleLimit    ##
+##   $(Get-Date -UFormat '%Y-%m-%d %H:%M')    ##
+###########################
 ${reset}
 "@
     $StartupBanner
 }
-else {
+
+if (($scriptCount -eq 0) -and ($null -eq $ondemand)) {
     $NoScriptsBanner = @"
 ${green}
 ######################################
 ## No scripts were found in the     ##
 ## Configuration -> Scripts section ##
-## of the add-on. 🤦                ##
+## of the add-on and On-Demand Mode ##
+## is not enabled either. 🤦        ##
 ## Nothing else to do. Bye.         ##
 ######################################
 ${reset}
@@ -86,39 +112,20 @@ ${reset}
     Exit 0
 }
 
-# Warn the user that on-demand is enabled.
-$ondemand = $OPTIONS.ondemand
-if ($ondemand) {
-    $OnDemandBanner = @"
-${red}
-###############################################
-##      ! ON-DEMAND MODE ENABLED !           ##
-##                                           ##
-##   When enabled, a thread job is created   ##
-##   to stop the add-on from exiting after   ##
-##   defined startup scripts complete.       ##
-##                                           ##
-## Use hassio.addon_stdin to send filenames. ##
-## Please review the README for more detail. ##
-###############################################
-${reset}
-"@
-    $OnDemandBanner
-    Start-ThreadJob -ScriptBlock {while($true){Start-Sleep -Seconds 3600}} -Name 'On-Demand-Listener' -ErrorAction Stop -ThrottleLimit $ThreadThrottleLimit > $null
-    Start-Process nohup 'pwsh -NoProfile -NoLogo -File /app/Read-HassIoStdIn.ps1'
-}
-
 # Loop through each script and start a thread job for each one
 foreach ($script in $scripts) {
     
     if ($null -eq $script.path) { $scriptLocation = $defaultScriptLocation }
     else { $scriptLocation = $script.path }
-    $validPath = Test-Path -Path "$scriptLocation$($script.filename)" -PathType Leaf
+
+    $scriptFullPath = Join-Path $scriptLocation $script.filename
+
+    $validPath = Test-Path -Path $scriptFullPath -PathType Leaf
 
     if ($validPath) {
-        $thisScript = Get-Item -Path "$scriptLocation$($script.filename)"
+        $thisScript = Get-Item -Path $scriptFullPath
         try {
-            $job = Start-ThreadJob -FilePath $thisScript.FullName -Name $thisScript.BaseName -StreamingHost $Host -ErrorAction Break -ThrottleLimit $ThreadThrottleLimit
+            $job = Start-ThreadJob -FilePath $thisScript.FullName -Name $thisScript.BaseName -StreamingHost $Host -ErrorAction Continue -ThrottleLimit $ThreadThrottleLimit
 
             $randomColour = $randomisedColours[$i]
             $jobColours[$job.Name] = $randomColour  # Store the job name and its associated colour
@@ -142,11 +149,13 @@ $jobCount = (Get-Job).Count
 if ($jobCount -eq 0) {
     $NoJobsBanner = @"
 ${green}
-##################################################
-## No thread jobs were added. Did you forget to ##
-## add your scripts in the right place ?        ##
-## Nothing else to do. Bye.                     ##
-##################################################
+#############################################
+## No thread jobs were added and On-Demand ##
+## Mode is not enabled/running. Did you    ##
+## forget to add your scripts in the       ##
+## right place?                            ##
+## Nothing else to do. Bye.                ##
+#############################################
 ${reset}
 "@
     $NoJobsBanner
@@ -155,11 +164,13 @@ ${reset}
 else {
     $JobsRunningBanner = @"
 ${green}
-######################
-## Jobs are running ##
-## ThrottleLimit: $ThreadThrottleLimit ##
-## $(Get-Date -UFormat '%d/%m/%Y %H:%M') ##
-######################
+########################################
+## On-Demand Mode / Declared scripts  ##
+## running...                         ##
+##                                    ##
+## ThrottleLimit: $ThreadThrottleLimit                   ##
+## $(Get-Date -UFormat '%Y-%m-%d %H:%M')                   ##
+########################################
 ${reset}
 "@
     $JobsRunningBanner
@@ -189,6 +200,10 @@ ${reset}
 
 while ($jobs = Get-Job) {
     foreach ($job in $jobs) {
+
+        # No point processing anything if it's the On-Demand-Listener job.
+        if ($job.Name -eq 'On-Demand-Listener') { Continue }
+
         $jobColour = $jobColours[$job.Name]
         switch ($job.State) {
             { ($_ -eq 'Completed') -or ($_ -eq 'Stopped') -or ($_ -eq 'Failed') } {
@@ -231,7 +246,7 @@ $CompleteBanner = @"
 ${green}#######################
 ##  HASS PowerShell  ##
 ## All jobs complete ##
-## $(Get-Date -UFormat '%d/%m/%Y %H:%M')  ##
+## $(Get-Date -UFormat '%Y-%m-%d %H:%M')  ##
 #######################${reset}
 "@
 

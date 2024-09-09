@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.0.5 - 2024-09-09
+ - Improve startup logic
+ - Add info to README about PS Modules
+ - Improve errors handling/feedback.
+
 ## 0.0.4 - 2024-09-08
  - Add "on-demand" feature.
 
