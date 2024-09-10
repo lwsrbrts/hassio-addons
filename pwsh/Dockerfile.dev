@@ -3,7 +3,7 @@
 FROM mcr.microsoft.com/powershell:latest
 
 LABEL \
-  io.hass.version="0.0.5" \
+  io.hass.version="0.0.6" \
   io.hass.type="addon" \
   io.hass.arch="amd64"
 
