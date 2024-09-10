@@ -18,6 +18,7 @@ $ThreadThrottleLimit = [int]$OPTIONS.threads
 
 # Colours for banner information during startup etc.
 $green = $PSStyle.Foreground.Green
+$blackbg = $PSStyle.Background.Black
 $red = $PSStyle.Foreground.Red
 $reset = $PSStyle.Reset
 
@@ -31,8 +32,7 @@ if ($OPTIONS.scripts.length -gt 10) {
 $defaultScriptLocation = '/share/pwsh/'
 if (!(Test-Path $defaultScriptLocation)) {
     $FolderBanner = @"
-${green}
-#####################################
+${green}#####################################
 ## Creating /share/pwsh folder...  ##
 #####################################
 
@@ -40,7 +40,8 @@ ${green}
 ## Since the folder has just been created, the add-on ##
 ## will stop now. Add your scripts and configure the  ##
 ## add-on now.                                        ##
-########################################################${reset}
+########################################################
+${reset}
 "@
     $FolderBanner
     New-Item -Path $defaultScriptLocation -ItemType Directory > $null
@@ -51,8 +52,7 @@ ${green}
 $ondemand = $OPTIONS.ondemand
 if ($ondemand) {
     $OnDemandBanner = @"
-${red}
-###############################################
+${blackbg}${red}###############################################
 ##      ! ON-DEMAND MODE ENABLED !           ##
 ##                                           ##
 ##   When enabled, a thread job is created   ##
@@ -81,8 +81,7 @@ $scriptCount = $scripts.Count
 
 if ($scriptCount -gt 0) {
     $StartupBanner = @"
-${green}
-###########################
+${green}###########################
 ## DECLARED SCRIPTS MODE ##
 ##                       ##
 ##    Starting up...     ##
@@ -98,8 +97,7 @@ ${reset}
 
 if (($scriptCount -eq 0) -and ($null -eq $ondemand)) {
     $NoScriptsBanner = @"
-${green}
-######################################
+${green}######################################
 ## No scripts were found in the     ##
 ## Configuration -> Scripts section ##
 ## of the add-on and On-Demand Mode ##
@@ -148,8 +146,7 @@ $jobCount = (Get-Job).Count
 
 if ($jobCount -eq 0) {
     $NoJobsBanner = @"
-${green}
-#############################################
+${green}#############################################
 ## No thread jobs were added and On-Demand ##
 ## Mode is not enabled/running. Did you    ##
 ## forget to add your scripts in the       ##
@@ -163,8 +160,7 @@ ${reset}
 }
 else {
     $JobsRunningBanner = @"
-${green}
-########################################
+${green}########################################
 ## On-Demand Mode / Declared scripts  ##
 ## running...                         ##
 ##                                    ##
@@ -247,7 +243,8 @@ ${green}#######################
 ##  HASS PowerShell  ##
 ## All jobs complete ##
 ## $(Get-Date -UFormat '%Y-%m-%d %H:%M')  ##
-#######################${reset}
+#######################
+${reset}
 "@
 
 $CompleteBanner

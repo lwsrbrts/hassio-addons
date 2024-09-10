@@ -6,11 +6,13 @@ while ($true) {
     $scripts = $inputJSON.scripts
     
     $redfg = $PSStyle.Foreground.Red
+    $blackbg = $PSStyle.Background.Black
+    $bluefg = $PSStyle.Foreground.Blue
     $reset = $PSStyle.Reset
     
     if (-not $scripts) {
         Write-Output @"
-${redfg}###############################################
+${blackbg}${redfg}###############################################
 #             ! ON-DEMAND ERROR !             #
 # The supplied "scripts" value is empty!      #
 # Ensure you're sending a properly formatted  #
@@ -21,7 +23,8 @@ ${redfg}###############################################
 #   input:                                    #
 #     scripts:                                #
 #       - filename: On-Demand.ps1             #
-###############################################${reset}
+###############################################
+${reset}
 "@
         Continue
     }
@@ -34,14 +37,17 @@ ${redfg}###############################################
     
         if (Test-Path $fullScriptPath) {    
             try {
-                Write-Output "$($redfg)ON-DEMAND:$($reset) Attempting to run $fullScriptPath..."
+                Write-Output "${blackbg}${redfg}ON-DEMAND:$($reset) Attempting to run $($bluefg)$fullScriptPath$($reset)..."
                 Start-Process -FilePath 'pwsh' -ArgumentList "-File `"$fullScriptPath`""
             }
             catch {
                 Write-Error "Error executing script: $_" -ErrorAction Continue
             }
         }
-        else { 'No file named: {0}' -f $fullScriptPath }
+        else { 
+            Write-Output "${blackbg}${redfg}ON-DEMAND ERROR:$($reset) File $($bluefg)$fullScriptPath$($reset) not found." `
+            "${blackbg}${redfg}File names and paths are cAsE-sEnsiTive.$($reset)"
+        }
     }
     Start-Sleep -Seconds 1
 }
