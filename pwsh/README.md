@@ -29,6 +29,8 @@ For **Declared** scripts, either:
 
 Start the add-on and review the `Log` section to see any output.
 
+**TIP**: To see how to interact with Home Assistant sensors using PowerShell scripts run by this add-on, see the [HOWTO](HOWTO.md) file.
+
 For **On-Demand** scripts:
 1. Ensure that the `On-Demand` feature toggle is enabled in the `Configuration` section of the add-on.
 2. Follow the same process as for **Declared** scripts to get your scripts in to a directory off `/share/`
