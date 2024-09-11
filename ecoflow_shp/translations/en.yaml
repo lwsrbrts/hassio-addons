@@ -1,0 +1,42 @@
+---
+configuration:
+  efhost:
+    name: ECOFLOW API Host
+    description: >-
+      The API host as provided on the ECOFLOW Developer Portal: https://developer.ecoflow.com/
+  accesskey:
+    name: ECOFLOW Developer Access Key
+    description: >-
+      The Developer Access Key provided on the ECOFLOW Developer Portal.
+  secretkey:
+    name: ECOFLOW Developer Secret Key
+    description: >-
+      The Developer Access Key provided on the ECOFLOW Developer Portal.
+  energysensor:
+    name: Energy Sensor Name
+    description: >-
+      The name of the sensor in Home Assistant that will contain energy data.
+  epssensor:
+    name: EPS Sensor Name
+    description: >-
+      The name of the binary sensor in Home Assistant that will show EPS status.
+  shpserial:
+    name: Smart Home Panel Serial Number
+    description: >-
+      The serial number of your Smart Home Panel, used to identify and retrieve
+      the energy and EPS status data.
+  polling:
+    name: Polling Frequency (seconds)
+    description: >-
+      The frequency with which the add-on will retrieve data from the ECOFLOW API.
+      This setting is options and defaults to 300 seconds (5 minutes).
+  language:
+    name: Culture Code
+    description: >-
+      A valid culture code as understood by PowerShell. en-US, en-GB, de-DE etc.
+      Which is used to format log dates and times correctly.
+  logging:
+    name: Enable Logging
+    description: >-
+      Outputs a simple date and time stamped "Last HA Push" log message so you can see
+      what the add-on is doing and when. Disable when you no longer need it.

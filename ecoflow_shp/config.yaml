@@ -1,0 +1,27 @@
+name: "ECOFLOW SHP Energy Usage"
+description: "Get Smart Home Panel energy data from the ECOFLOW API"
+version: "0.0.1"
+slug: "ecoflow_shp"
+init: false
+arch:
+  - armhf
+  - armv7
+  - aarch64
+  - amd64
+  - i386
+startup: application
+homeassistant_api: true
+options:
+  energysensor: "sensor.shp_energy_usage"
+  epssensor: "binary_sensor.shp_eps_status"
+  logging: true
+schema:
+  efhost: str
+  accesskey: str
+  secretkey: password
+  energysensor: str
+  epssensor: str
+  shpserial: str
+  polling: int?
+  language: str?
+  logging: bool
