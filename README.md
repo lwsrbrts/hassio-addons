@@ -11,3 +11,4 @@ https://github.com/lwsrbrts/hassio-addons
 
 ## Add-ons in this repository
  - **[PowerShell](/pwsh/README.md)**: Run PowerShell scripts in Home Assistant.
+ - **[ECOFLOW SHP Energy Usage](/ecoflow_shp/README.md)**: Get Smart Home Panel energy data from the ECOFLOW API..
