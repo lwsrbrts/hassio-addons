@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.7 - 2024-09-13
+ - Enable `addon_config` map.
+   - Scripts/resources can be stored in `addon_configs/{slug}` folder.
+
 ## 0.0.6 - 2024-09-10
  - Improve logging for On-Demand
 

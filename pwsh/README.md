@@ -18,12 +18,15 @@ There's two ways.
 
 For **Declared** scripts, either:
 1. Copy your scripts to `\\{HASS}\share\pwsh` (create it if you need to), then add the file names of the scripts to the `Scripts` section in `Configuration` as shown below.
-2. Use Home Assistant's Add Network storage feature to mount a network location as a `Share` type. Ensure this is available to Home Assistant by navigating to eg. `\\{HASS}\share\mynasfolder`. Place your scripts there and declare the path appropriately as part of the `Scripts` section, with a trailing forward slash.
+2. Copy your scripts to `\\{HASS}\addon_configs\{random-chars}_pwsh` folder, then add the file name(s) AND path, ensuring to begin with `/config/`, of the script to the `Scripts` section in `Configuration`.
+3. Use Home Assistant's Add Network storage feature to mount a network location as a `Share` type. Ensure this is available to Home Assistant by navigating to eg. `\\{HASS}\share\mynasfolder`. Place your scripts there and declare the path appropriately as part of the `Scripts` section.
 
 ```yaml
 - filename: My-AwesomeScript.ps1 # in share/pwsh/
 - filename: My-OtherAwesomeScript.ps1
   path: /share/mynasfolder/scripts/
+- filename: My-ThirdAwesomeScript.ps1 # in addon_configs/{random-chars}_pwsh/
+  path: /config/
 - filename: TEST.ps1 # in share/pwsh/
 ```
 
@@ -33,7 +36,7 @@ Start the add-on and review the `Log` section to see any output.
 
 For **On-Demand** scripts:
 1. Ensure that the `On-Demand` feature toggle is enabled in the `Configuration` section of the add-on.
-2. Follow the same process as for **Declared** scripts to get your scripts in to a directory off `/share/`
+2. Follow the same process as for **Declared** scripts to put your scripts in to a directory off `/share/` or `/addon_configs\{random-chars}_pwsh`.
 3. Use the Home Assistant Action `hassio.addon_stdin` to send properly formatted data containing the `filename`s and their `path`s (if not in `/share/pwsh/`) to the add-on.
 
 ```yaml
@@ -45,6 +48,8 @@ data:
       - filename: On-Demand.ps1
       - filename: Test-Script.ps1
         path: /share/pwsh/
+      - filename: My-ThirdAwesomeScript.ps1 # in addon_configs/{random-chars}_pwsh/
+        path: /config/
 ```
 
 Yes, this means you can schedule or run PowerShell scripts as Actions in Automations and Scripts.
