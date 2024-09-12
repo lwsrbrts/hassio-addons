@@ -1,6 +1,6 @@
 name: "PowerShell"
 description: "Run PowerShell scripts in Home Assistant"
-version: "0.0.6"
+version: "0.0.7"
 slug: "pwsh"
 init: false
 stdin: true
@@ -13,6 +13,7 @@ url: "https://github.com/lwsrbrts/hassio-addons/tree/main/pwsh"
 map:
   - type: share
     read_only: false
+  - type: addon_config
 homeassistant_api: true
 options:
   scripts: []
