@@ -2,6 +2,8 @@
 
 Get Smart Home Panel energy data from the ECOFLOW API.
 
+Don't forget to review the Documentation tab for usage information!
+
 ![Supports amd64 Architecture][amd64-shield]
 
 May also support other architectures and platforms since the base image is based on Home Assistant's own Alpine Linux image.
