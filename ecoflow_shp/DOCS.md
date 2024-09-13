@@ -1,6 +1,14 @@
 # How to use this add-on
 
-The following YAML assumes you use the default sensor names.
+First, you'll need a Developer Account at [ECOFLOW Developer Portal](https://developer.ecoflow.com/). Once you have that (manual approval by ECOLFOW), you'll need a Developer Access Key and Developer Secret Key which you obtain from the ECOFLOW Developer Portal.
+
+This add-on is intentionally limited in scope. I recommend you use the MQTT API since it doesn't require regular polling to get near real-time updates on current circuit power use from the Smart Home Panel.
+
+The _issue_ with the MQTT API is that, as of September 2024, it does not include the hourly per-circuit grid and battery usage split data, EPS state or the charging and discharging limit setting on the Smart Home Panel. This add-on fills those gaps but it only polls for the data from the HTTP API every 5 minutes by default. This is customisable but I would not recommend increasing it since ECOFLOW could just revoke your developer access - besides, this data isn't changing regularly enough to warrant more frequent polling.
+
+The following YAML assumes you use the default sensor names provided by this add-on. The below YAML will create additional `template` sensors, using the data in the sensors created and updated by this add-on to give you usable sensors.
+
+I'm not being lazy by not doing this in the add-on, it's just easier to do it using a template sensor and so I'm not trying to imagine what your data looks like, munjing it etc. All the add-on will do is retrieve the data from the ECOFLOW HTTP API and drop it in to the sensors. Any failures should result in appropriate messages on the Log tab.
 
 ## Create GRID usage template sensors
 
@@ -19,6 +27,8 @@ template:
         state_class: total
         state: "{{state_attr('sensor.shp_energy_usage','grid_usage')[0] | sum | round(0)}}"
         last_reset: "{{ today_at() }}"
+
+        # ---REPEAT FOR OTHER 9 CIRCUITS---
 ```
 
 Once you've set up all the **circuit** template sensors, you could add another one to add them all up and give you a total:
@@ -81,3 +91,6 @@ template:
         last_reset: "{{ today_at() }}"
 ```
 
+## EPS & Charging/Discharging Limits
+
+These are their own sensors, use them as you require.

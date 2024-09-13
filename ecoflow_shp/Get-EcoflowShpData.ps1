@@ -226,8 +226,12 @@ $EF_SECRET_KEY = $OPTIONS.secretkey
 
 # Set the SHP Serial.
 $SHP_SERIAL = $OPTIONS.shpserial
+
+# Set the sensor names
 $HASS_ENERGY_SENSOR_NAME = $OPTIONS.energysensor
 $HASS_EPS_SENSOR_NAME = $OPTIONS.epssensor
+$HASS_CHARGING_LIMIT_SENSOR_NAME = $OPTIONS.charginglimitsensor
+$HASS_DISCHARGING_LIMIT_SENSOR_NAME = $OPTIONS.discharginglimitsensor
 
 # Set the polling frequency
 $POLLING_FREQUENCY = $OPTIONS.polling
@@ -258,7 +262,7 @@ while ($true) {
     $params = @{
         sn     = $SHP_SERIAL # We need to set this here because we aren't using the URL parameters (stuff after ? ie. "?name1=value1&name2=value2").
         params = @{
-            quotas = @('backupLoadWatt.watth', 'mainsLoadWatt.watth', 'epsModeInfo.eps')
+            quotas = @('backupLoadWatt.watth', 'mainsLoadWatt.watth', 'epsModeInfo.eps', 'backupChaDiscCfg.forceChargeHigh', 'backupChaDiscCfg.discLower')
         }
     }
 
@@ -303,6 +307,36 @@ while ($true) {
             "Authorization" = "Bearer $homeAssistantToken"
             'Content-Type'  = 'application/json'
         } -Body $energy_data
+
+        # Prepare the CHARGING LIMIT data to send to Home Assistant
+        $charginglimit = @{
+            state      = [int]$ef_request.data.'backupChaDiscCfg.forceChargeHigh' # This could be something else here.
+            attributes = @{
+                friendly_name  = "Smart Home Panel Charging Limit"
+                last_execution = [int](Get-Date -UFormat %s)
+            }
+        } | ConvertTo-Json -Depth 5
+
+        # Send the ENERGY data to Home Assistant
+        $ha_response = Invoke-RestMethod -Uri "$homeAssistantBaseUrl$HASS_CHARGING_LIMIT_SENSOR_NAME" -Method Post -Headers @{
+            "Authorization" = "Bearer $homeAssistantToken"
+            'Content-Type'  = 'application/json'
+        } -Body $charginglimit
+
+        # Prepare the DISCHARGING LIMIT data to send to Home Assistant
+        $discharginglimit = @{
+            state      = [int]$ef_request.data.'backupChaDiscCfg.discLower' # This could be something else here.
+            attributes = @{
+                friendly_name  = "Smart Home Panel Discharging Limit"
+                last_execution = [int](Get-Date -UFormat %s)
+            }
+        } | ConvertTo-Json -Depth 5
+
+        # Send the ENERGY data to Home Assistant
+        $ha_response = Invoke-RestMethod -Uri "$homeAssistantBaseUrl$HASS_DISCHARGING_LIMIT_SENSOR_NAME" -Method Post -Headers @{
+            "Authorization" = "Bearer $homeAssistantToken"
+            'Content-Type'  = 'application/json'
+        } -Body $discharginglimit
 
         if ($LOGGING) {
             $utcDateTime = $ha_response.last_reported

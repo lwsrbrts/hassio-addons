@@ -20,6 +20,14 @@ configuration:
     name: EPS Sensor Name
     description: >-
       The name of the binary sensor in Home Assistant that will show EPS status.
+  charginglimitsensor:
+    name: Charging Limit Sensor Name
+    description: >-
+      The name of the number sensor in Home Assistant that will contain the charging limit.
+  discharginglimitsensor:
+    name: Discharging Limit Sensor Name
+    description: >-
+      The name of the number sensor in Home Assistant that will contain the discharging limit.
   shpserial:
     name: Smart Home Panel Serial Number
     description: >-
