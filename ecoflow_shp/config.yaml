@@ -1,6 +1,6 @@
 name: "ECOFLOW SHP Energy Usage"
 description: "Get Smart Home Panel energy data from the ECOFLOW API"
-version: "0.0.3"
+version: "0.0.4"
 slug: "ecoflow_shp"
 init: false
 arch:
