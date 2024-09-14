@@ -77,7 +77,6 @@ function Format-SigningString {
     return $signableString
 }
 
-
 # We sign the request (technically the stringToSign) using HMAC-SHA256.
 function Get-Signature {
     param (
@@ -188,11 +187,18 @@ function Get-HttpData {
 }
 # Path to options.json file - this is the file that's placed/mapped/linked in to the running container.
 $OPTIONS_FILE = '/data/options.json'
+
 # Read and convert the JSON file to a PowerShell object - we'll use these to get data from the user for use later.
-$OPTIONS = Get-Content $OPTIONS_FILE | ConvertFrom-Json
+$OPTIONS = Get-Content $OPTIONS_FILE -Raw | ConvertFrom-Json
+
+# Language setting
+$LANGUAGESETTING = $OPTIONS.language
+
+# Set some ANSI colours
+$redfg = $PSStyle.Foreground.Red
+$reset = $PSStyle.Reset
 
 # If the user specifies, we can set the culture so dates and times look correct.
-$LANGUAGESETTING = $OPTIONS.language
 try {
     if ($LANGUAGESETTING) {
         $CultureInfo = [System.Globalization.CultureInfo]::GetCultureInfo($LANGUAGESETTING, $true)
@@ -202,14 +208,14 @@ try {
     }
 }
 catch {
-    $message = @"
-Improper culture/language code ("$LANGUAGESETTING") specified.
+    Write-Output @"
+${redfg}Improper culture/language code ("$LANGUAGESETTING") specified.
 To get a suitable culture/language code, use:
 [System.Globalization.CultureInfo]::GetCultures([System.Globalization.CultureTypes]::AllCultures)
 in a PowerShell session.
-Using InvariantCulture instead.
+Using InvariantCulture instead...
+${reset}
 "@
-    Write-Error $message
     $CultureInfo = [System.Globalization.CultureInfo]::InvariantCulture
 }
 finally {
@@ -257,7 +263,6 @@ Write-Output '⬇️⬇️⬇️⬇️⬇️'
 
 # Loop forever
 while ($true) {
-    
     # Define the parameters we send to the API, these will be flattened and then signed.
     $params = @{
         sn     = $SHP_SERIAL # We need to set this here because we aren't using the URL parameters (stuff after ? ie. "?name1=value1&name2=value2").
@@ -310,14 +315,15 @@ while ($true) {
 
         # Prepare the CHARGING LIMIT data to send to Home Assistant
         $charginglimit = @{
-            state      = [int]$ef_request.data.'backupChaDiscCfg.forceChargeHigh' # This could be something else here.
+            state      = [float]$ef_request.data.'backupChaDiscCfg.forceChargeHigh'
             attributes = @{
                 friendly_name  = "Smart Home Panel Charging Limit"
                 last_execution = [int](Get-Date -UFormat %s)
+                step = [int]1
             }
         } | ConvertTo-Json -Depth 5
 
-        # Send the ENERGY data to Home Assistant
+        # Send the CHARGING LIMIT data to Home Assistant
         $ha_response = Invoke-RestMethod -Uri "$homeAssistantBaseUrl$HASS_CHARGING_LIMIT_SENSOR_NAME" -Method Post -Headers @{
             "Authorization" = "Bearer $homeAssistantToken"
             'Content-Type'  = 'application/json'
@@ -325,23 +331,22 @@ while ($true) {
 
         # Prepare the DISCHARGING LIMIT data to send to Home Assistant
         $discharginglimit = @{
-            state      = [int]$ef_request.data.'backupChaDiscCfg.discLower' # This could be something else here.
+            state      = [float]$ef_request.data.'backupChaDiscCfg.discLower'
             attributes = @{
                 friendly_name  = "Smart Home Panel Discharging Limit"
                 last_execution = [int](Get-Date -UFormat %s)
+                step = [int]1
             }
         } | ConvertTo-Json -Depth 5
 
-        # Send the ENERGY data to Home Assistant
+        # Send the DISCHARGING data to Home Assistant
         $ha_response = Invoke-RestMethod -Uri "$homeAssistantBaseUrl$HASS_DISCHARGING_LIMIT_SENSOR_NAME" -Method Post -Headers @{
             "Authorization" = "Bearer $homeAssistantToken"
             'Content-Type'  = 'application/json'
         } -Body $discharginglimit
 
         if ($LOGGING) {
-            $utcDateTime = $ha_response.last_reported
-            $utcDateTimeObj = [DateTime]::Parse($utcDateTime)
-            Write-Output "Last HA Push: $utcDateTimeObj"
+            "Last HA Push: {0}" -f $(Get-Date -Date $ha_response.last_reported -Format "yyyy-MM-dd HH:mm:ss")
         }
     }
     else {
