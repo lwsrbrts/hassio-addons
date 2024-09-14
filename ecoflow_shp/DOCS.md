@@ -1,6 +1,6 @@
 # How to use this add-on
 
-First, you'll need a Developer Account at [ECOFLOW Developer Portal](https://developer.ecoflow.com/). Once you have that (manual approval by ECOLFOW), you'll need a Developer Access Key and Developer Secret Key which you obtain from the ECOFLOW Developer Portal.
+First, you'll need a Developer Account at [ECOFLOW Developer Portal](https://developer.ecoflow.com/). Once you have that (manual approval by ECOFOW), you'll need a Developer Access Key and Developer Secret Key which you obtain from the ECOFLOW Developer Portal.
 
 This add-on is intentionally limited in scope. I recommend you use the MQTT API since it doesn't require regular polling to get near real-time updates on current circuit power use from the Smart Home Panel.
 
