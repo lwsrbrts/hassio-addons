@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.0.8 - 2024-11-05
+ - Bump PowerShell to 7.4.6.
+
 ## 0.0.7 - 2024-09-13
  - Enable `addon_config` map.
    - Scripts/resources can be stored in `addon_configs/{slug}` folder.
