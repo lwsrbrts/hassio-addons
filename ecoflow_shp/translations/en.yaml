@@ -7,11 +7,11 @@ configuration:
   accesskey:
     name: ECOFLOW Developer Access Key
     description: >-
-      The Developer Access Key provided on the ECOFLOW Developer Portal.
+      The Developer AccessKey provided on the ECOFLOW Developer Portal.
   secretkey:
     name: ECOFLOW Developer Secret Key
     description: >-
-      The Developer Access Key provided on the ECOFLOW Developer Portal.
+      The Developer SecretKey provided on the ECOFLOW Developer Portal.
   energysensor:
     name: Energy Sensor Name
     description: >-
