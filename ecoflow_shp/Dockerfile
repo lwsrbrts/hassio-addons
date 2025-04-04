@@ -2,7 +2,7 @@
 ARG BUILD_FROM
 FROM $BUILD_FROM AS installer-env
 
-ARG PS_VERSION=7.4.6
+ARG PS_VERSION=7.5.0
 ARG PS_PACKAGE=powershell-${PS_VERSION}-linux-musl-x64.tar.gz
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_INSTALL_VERSION=7
@@ -34,7 +34,7 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
   LANG=en_US.UTF-8 \
   # set a fixed location for the Module analysis cache
   PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache \
-  POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-Alpine-3.19
+  POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-Alpine-3.20
 
 ENV TZ=Europe/London
 
@@ -50,8 +50,6 @@ RUN apk add --no-cache \
   krb5-libs \
   libgcc \
   libintl \
-  # Apparently no longer in Alpine as of 3.18 and needs libssl3
-  #libssl1.1 \
   libssl3 \
   libstdc++ \
   tzdata \

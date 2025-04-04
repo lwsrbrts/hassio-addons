@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.0.6 - 2025-04-04
+ - Bump PowerShell to 7.5.0
+
 ## 0.0.5 - 2024-11-28
  - Bump PowerShell to 7.4.6
  - Update description for key secret to differentiate.
