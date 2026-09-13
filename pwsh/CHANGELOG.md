@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.0 - 2026-09-13
+ - Bump PowerShell to 7.6.6 (.NET 10)
+ - Update Start-ThreadJob docs link to current moniker
+
 ## 0.0.9 - 2025-03-22
  - Bump PowerShell to 7.5.0
  - Alpine 3.20 base image
