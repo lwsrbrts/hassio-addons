@@ -183,6 +183,8 @@ while (-not (Test-Path $stopFile)) {
 
 This is just an example, obviously there is no error checking in the example above.
 
+NB: A state created this way is not backed by a real entity and will be gone after a Home Assistant restart. If you want a sensor that persists, see the **Making the sensor persistent** section of the [HOWTO](HOWTO.md) file, which shows how to declare a simple template sensor in your `configuration.yaml` that mirrors it — no changes to your script are needed.
+
 ## How does logging work?
 
 ### for **Declared** scripts...
