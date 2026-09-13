@@ -1,8 +1,8 @@
-# Dockerfile reference: https://github.com/PowerShell/PowerShell-Docker/blob/master/release/7-4/alpine317/docker/Dockerfile
+# Dockerfile reference: https://github.com/PowerShell/PowerShell-Docker/blob/master/release/7-6/alpine320/docker/Dockerfile
 ARG BUILD_FROM
 FROM $BUILD_FROM AS installer-env
 
-ARG PS_VERSION=7.5.0
+ARG PS_VERSION=7.6.6
 ARG PS_PACKAGE=powershell-${PS_VERSION}-linux-musl-x64.tar.gz
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_INSTALL_VERSION=7

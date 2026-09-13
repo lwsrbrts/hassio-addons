@@ -32,7 +32,7 @@ Write-Output "Stop file found. Exiting."
 
 If the add-on is stopping, then it either has no scripts to run, it has finished running the scripts, something failed or the `On-Demand` feature isn't enabled. Obviously these are *YOUR* scripts, the add-on is just running them using `Start-ThreadJob` for **Declared** scripts or using `Start-Process` for **On-Demand** scripts.
 
-If your script isn't working, please don't ask me to fix it or ask me why it isn't working. Take it back to your computer and try running it as a threaded job (see [Start-ThreadJob](https://learn.microsoft.com/en-us/powershell/module/threadjob/start-threadjob?view=powershell-7.4)) to see what happens. If you believe you found the reason and it could be related to the threading script and it can probably be fixed, please feel free to let me know.
+If your script isn't working, please don't ask me to fix it or ask me why it isn't working. Take it back to your computer and try running it as a threaded job (see [Start-ThreadJob](https://learn.microsoft.com/en-us/powershell/module/threadjob/start-threadjob?view=powershell-7.5)) to see what happens. If you believe you found the reason and it could be related to the threading script and it can probably be fixed, please feel free to let me know.
 
 ## How do I provide arguments to my scripts?
 
